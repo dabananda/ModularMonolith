@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ModularMonolith.Shared.Common
 {
@@ -7,7 +7,7 @@ namespace ModularMonolith.Shared.Common
         public const int MaxPageSize = 100;
         public const int DefaultPageSize = 20;
 
-        public static async Task<PagedResult<T>> ToPagedResultAsync<T>(this IQueryable<T> query,int pageNumber,int pageSize,CancellationToken cancellationToken = default)
+        public static async Task<PagedResult<T>> ToPagedResultAsync<T>(this IQueryable<T> query, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             pageNumber = pageNumber < 1 ? 1 : pageNumber;
             pageSize = pageSize < 1 ? DefaultPageSize : Math.Min(pageSize, MaxPageSize);

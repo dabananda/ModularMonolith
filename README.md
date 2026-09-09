@@ -23,6 +23,7 @@ This template is designed to serve as a robust, scalable foundation for enterpri
   - [Database Setup & Migrations](#database-setup--migrations)
   - [Running the Application](#running-the-application)
 - [Project Conventions](#project-conventions)
+- [Contributing](#contributing)
 
 ---
 
@@ -384,3 +385,9 @@ Once running:
 | **CQRS** | In-house mediator commands and queries | `LoginCommand : IRequest<Result<AuthResponse>>` |
 | **Validation** | FluentValidation rules paired with commands | `RegisterCommandValidator : AbstractValidator<RegisterCommand>` |
 | **Controllers** | Inherit from `BaseController` using `HandleResult()` | `return HandleResult(await sender.Send(command));` |
+
+---
+
+## Contributing
+
+Contributions, bug reports, and feature proposals are very welcome! Please read our [Contribution Guidelines](CONTRIBUTING.md) for architectural guardrails, coding standards, compiler rules, and pull request workflows before submitting a PR.
