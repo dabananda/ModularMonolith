@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Domain.Entities;
+using ModularMonolith.Modules.Identity.Domain.Entities;
 
 namespace ModularMonolith.Modules.Identity.Application.Interfaces
 {
@@ -6,6 +6,7 @@ namespace ModularMonolith.Modules.Identity.Application.Interfaces
     {
         Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default);
         Task RegisterAsync(ApplicationUser user, CancellationToken cancellationToken = default);
+        Task<ApplicationUser?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<ApplicationUser?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
         Task<ApplicationUser?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
         Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);
@@ -13,5 +14,6 @@ namespace ModularMonolith.Modules.Identity.Application.Interfaces
         Task<ApplicationUser?> GetByEmailVerificationTokenAsync(string token, CancellationToken cancellationToken = default);
         Task AddPasswordResetTokenAsync(PasswordResetToken token, CancellationToken cancellationToken = default);
         Task<ApplicationUser?> GetByPasswordResetTokenAsync(string token, CancellationToken cancellationToken = default);
+        void Update(ApplicationUser user);
     }
 }

@@ -6,7 +6,6 @@
 key/
 private.pem
 public.pem
-appsettings.json
 
 # User-specific files
 *.rsuser

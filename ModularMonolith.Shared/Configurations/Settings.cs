@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ModularMonolith.Shared.Configurations
 {
@@ -53,5 +53,7 @@ namespace ModularMonolith.Shared.Configurations
         public string Password { get; set; } = string.Empty;
         public string From { get; set; } = string.Empty;
         public string FromName { get; set; } = string.Empty;
+        public string BaseUrl { get; set; } = "https://localhost:5000";
+        public string ClientUrl { get; set; } = "https://localhost:3000";
     }
 }

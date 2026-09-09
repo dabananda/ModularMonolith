@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Role\**" />
-    <EmbeddedResource Remove="Role\**" />
-    <None Remove="Role\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ModularMonolith.Modules.Identity.Domain\ModularMonolith.Modules.Identity.Domain.csproj" />
   </ItemGroup>
 

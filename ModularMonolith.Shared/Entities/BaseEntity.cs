@@ -13,5 +13,12 @@
         public Guid? CreatedBy { get; protected internal set; }
         public Guid? UpdatedBy { get; protected internal set; }
         public Guid? DeletedBy { get; protected internal set; }
+
+        public void MarkDeleted()
+        {
+            if (IsDeleted) return;
+            IsDeleted = true;
+            DeletedAt = DateTime.UtcNow;
+        }
     }
 }

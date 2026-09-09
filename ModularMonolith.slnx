@@ -13,4 +13,7 @@
   <Folder Name="/src/Shared/">
     <Project Path="ModularMonolith.Shared/ModularMonolith.Shared.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="ModularMonolith.Tests/ModularMonolith.Tests.csproj" />
+  </Folder>
 </Solution>

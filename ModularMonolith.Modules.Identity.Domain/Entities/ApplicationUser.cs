@@ -1,12 +1,12 @@
-﻿using ModularMonolith.Shared.Entities;
+using ModularMonolith.Shared.Entities;
 
 namespace ModularMonolith.Modules.Identity.Domain.Entities
 {
     public class ApplicationUser : BaseEntity
     {
-        public string Email { get; private set; }
-        public string PasswordHash { get; private set; }
-        public string Username { get; private set; }
+        public string Email { get; private set; } = null!;
+        public string PasswordHash { get; private set; } = null!;
+        public string Username { get; private set; } = null!;
         public bool EmailConfirmed { get; private set; }
         public DateTime? LastLoginAt { get; private set; }
         public bool IsActive { get; private set; } = true;

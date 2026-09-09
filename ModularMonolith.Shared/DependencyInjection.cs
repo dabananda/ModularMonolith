@@ -1,12 +1,12 @@
-﻿using ModularMonolith.Shared.Behaviors;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using ModularMonolith.Shared.Behaviors;
 using ModularMonolith.Shared.Configurations;
 using ModularMonolith.Shared.Interfaces;
 using ModularMonolith.Shared.Messaging;
 using ModularMonolith.Shared.Persistence;
 using ModularMonolith.Shared.Services;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace ModularMonolith.Shared
@@ -22,7 +22,7 @@ namespace ModularMonolith.Shared
             services.AddDbContext<SharedDbContext>((sp, options) =>
             {
                 options.UseSqlServer(settings.ConnectionStrings.SqlServerLocal);
-                options.AddInterceptors(new AuditSaveChangesInterceptor(sp.GetRequiredService<ICurrentUserService>()));
+                options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
             });
 
             services.AddScoped<ISender, Sender>();

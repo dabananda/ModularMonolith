@@ -1,8 +1,8 @@
-﻿using ModularMonolith.Shared.Entities;
-using ModularMonolith.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using ModularMonolith.Shared.Entities;
+using ModularMonolith.Shared.Interfaces;
 
 namespace ModularMonolith.Shared.Persistence
 {
@@ -44,6 +44,13 @@ namespace ModularMonolith.Shared.Persistence
                         entry.Entity.UpdatedBy = userId;
 
                         HandleSoftDelete(entry, now, userId);
+                        break;
+
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Modified;
+                        entry.Entity.IsDeleted = true;
+                        entry.Entity.DeletedAt = now;
+                        entry.Entity.DeletedBy = userId;
                         break;
                 }
             }

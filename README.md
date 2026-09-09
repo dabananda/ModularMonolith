@@ -74,7 +74,7 @@ At runtime, the API host project acts as the composition root:
 ```
 ModularMonolith/
 ├── ModularMonolith.slnx                                 # Modern .NET 10 solution file
-├── ModularMonolith.sln                                  # Classic visual studio solution file
+├── Directory.Build.props                                # Centralized compiler rules & zero warning policy
 ├── README.md
 ├── .gitignore
 │
@@ -87,7 +87,7 @@ ModularMonolith/
 │   ├── appsettings.Development.json
 │   ├── ModularMonolith.Api.csproj
 │   ├── ModularMonolith.Api.http                         # REST client testing file
-│   └── Program.cs                                       # DI composition root & middleware pipeline
+│   └── Program.cs                                       # DI composition root, JWT Auth, Swagger & pipeline
 │
 ├── ModularMonolith.Shared/                              # Cross-cutting Shared Kernel
 │   ├── Behaviors/
@@ -98,7 +98,7 @@ ModularMonolith/
 │   │   ├── ErrorType.cs                                # Structured error classifications
 │   │   ├── Result.cs                                   # Functional Result and Result<T> wrappers
 │   │   ├── PagedResult.cs                              # Pagination models
-│   │   └── Slug.cs                                     # URL slug helper
+│   │   └── Slug.cs                                     # Source-generated URL slug helper
 │   ├── Configurations/
 │   │   └── Settings.cs                                 # Strongly typed options with validation
 │   ├── Controllers/
@@ -119,7 +119,7 @@ ModularMonolith/
 │   │   └── Sender.cs
 │   ├── Migrations/
 │   ├── Persistence/
-│   │   ├── AuditInterceptor.cs                         # Automatic audit trail interceptor
+│   │   ├── AuditInterceptor.cs                         # Automatic audit trail & soft-delete interceptor
 │   │   └── SharedDbContext.cs                          # EF Core context for shared schema
 │   ├── Services/
 │   │   ├── CloudinaryImageService.cs
@@ -129,21 +129,30 @@ ModularMonolith/
 │   ├── DependencyInjection.cs
 │   └── ModularMonolith.Shared.csproj
 │
-└── ModularMonolith.Modules.Identity.*                   # Identity & Access Management slice
-    ├── ModularMonolith.Modules.Identity.Domain/
-    │   ├── Constants/                                  # Roles, schema constants
-    │   └── Entities/                                   # User, Role, RefreshToken, VerificationToken
-    ├── ModularMonolith.Modules.Identity.Application/
-    │   ├── Features/Auth/                              # Register, Login, Refresh, Password Reset, etc.
-    │   ├── Interfaces/                                 # Auth & Role repositories, JWT & Hasher contracts
-    │   └── DependencyInjection/                        # Automatic handler & validator discovery
-    ├── ModularMonolith.Modules.Identity.Infrastructure/
-    │   ├── Persistence/                                # ApplicationDbContext ('identity' schema)
-    │   ├── Repositories/                               # Auth & Role repository implementations
-    │   └── Security/                                   # BCrypt hasher, Secure tokens, JWT generator
-    └── ModularMonolith.Modules.Identity.Presentation/
-        ├── Controllers/                                # AuthController, RolesController
-        └── DependencyInjection.cs                      # AddIdentityModule extension
+├── ModularMonolith.Modules.Identity.*                   # Identity & Access Management slice
+│   ├── ModularMonolith.Modules.Identity.Domain/
+│   │   ├── Constants/                                  # Roles, schema constants
+│   │   └── Entities/                                   # User, Role, RefreshToken, VerificationToken
+│   ├── ModularMonolith.Modules.Identity.Application/
+│   │   ├── Features/Auth/                              # Register, Login, Refresh, Password Reset, etc.
+│   │   ├── Features/Role/                              # Role CRUD, Assign, Remove
+│   │   ├── Interfaces/                                 # Auth & Role repositories, JWT & Hasher contracts
+│   │   └── DependencyInjection/                        # Automatic handler & validator discovery
+│   ├── ModularMonolith.Modules.Identity.Infrastructure/
+│   │   ├── Persistence/                                # ApplicationDbContext ('identity' schema)
+│   │   ├── Repositories/                               # Auth & Role repository implementations
+│   │   └── Security/                                   # BCrypt hasher, Secure tokens, JWT generator
+│   └── ModularMonolith.Modules.Identity.Presentation/
+│       ├── Controllers/                                # AuthController, RolesController
+│       └── DependencyInjection.cs                      # AddIdentityModule extension
+│
+└── ModularMonolith.Tests/                               # Automated unit & domain test suite
+    ├── CommonTests.cs                                  # Result & utility tests
+    ├── MediatorTests.cs                                # Mediator pipeline & validation behavior tests
+    ├── AuditInterceptorTests.cs                        # EF Core auditing & soft delete tests
+    ├── ApplicationUserDomainTests.cs                   # User domain logic tests
+    ├── RoleDomainTests.cs                              # Role domain logic tests
+    └── AuthFeaturesTests.cs                            # CQRS handler tests
 ```
 
 ---
@@ -228,7 +237,10 @@ Provides cross-cutting utilities and infrastructure:
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/api/v1/roles` | List all roles |
+| `GET` | `/api/v1/roles/{id}` | Get role by ID |
 | `POST` | `/api/v1/roles` | Create a new role |
+| `PUT` | `/api/v1/roles` | Update role details |
+| `DELETE` | `/api/v1/roles/{id}` | Soft delete role by ID |
 | `POST` | `/api/v1/roles/assign` | Assign role to user |
 | `POST` | `/api/v1/roles/remove` | Remove role from user |
 

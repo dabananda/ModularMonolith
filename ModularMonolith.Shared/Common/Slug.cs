@@ -1,10 +1,14 @@
-﻿using System.Text;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ModularMonolith.Shared.Common
 {
-    public static class Slug
+    public static partial class Slug
     {
+        [GeneratedRegex(@"[^a-z0-9]+")]
+        private static partial Regex NonAlphaNumericRegex();
+
         public static string Generate(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -13,14 +17,13 @@ namespace ModularMonolith.Shared.Common
             }
 
             name = name.ToLowerInvariant().Trim();
-
             name = name.Normalize(NormalizationForm.FormD);
-            var sb = new StringBuilder();
+
+            var sb = new StringBuilder(name.Length);
 
             foreach (char c in name)
             {
-                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) !=
-                    System.Globalization.UnicodeCategory.NonSpacingMark)
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 {
                     sb.Append(c);
                 }
@@ -28,7 +31,7 @@ namespace ModularMonolith.Shared.Common
 
             name = sb.ToString().Normalize(NormalizationForm.FormC);
 
-            name = Regex.Replace(name, @"[^a-z0-9]+", "-");
+            name = NonAlphaNumericRegex().Replace(name, "-");
 
             return name.Trim('-');
         }

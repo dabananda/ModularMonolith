@@ -1,5 +1,5 @@
-﻿using ModularMonolith.Shared.Interfaces;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using ModularMonolith.Shared.Interfaces;
 using System.Text.Json;
 
 namespace ModularMonolith.Shared.Services

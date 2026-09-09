@@ -1,17 +1,18 @@
-﻿using ModularMonolith.Shared.Configurations;
-using ModularMonolith.Shared.Interfaces;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
 using MimeKit;
+using ModularMonolith.Shared.Configurations;
+using ModularMonolith.Shared.Interfaces;
 using System.Net;
 
 namespace ModularMonolith.Shared.Services
 {
-    internal class EmailService(Settings settings) : IEmailService
+    internal class EmailService(Settings settings, ILogger<EmailService> logger) : IEmailService
     {
         public async Task SendEmailVerificationLinkAsync(string name, string email, string token, CancellationToken cancellationToken = default)
         {
-            var link = BuildLink(token);
+            var link = BuildVerificationLink(token);
 
             var body = $"""
                 <p>Hi {WebUtility.HtmlEncode(name)},</p>
@@ -25,7 +26,7 @@ namespace ModularMonolith.Shared.Services
 
         public async Task SendPasswordResetLinkAsync(string name, string email, string token, CancellationToken cancellationToken = default)
         {
-            var link = BuildLink(token);
+            var link = BuildPasswordResetLink(token);
 
             var body = $"""
                 <p>Hi {WebUtility.HtmlEncode(name)},</p>
@@ -37,13 +38,26 @@ namespace ModularMonolith.Shared.Services
             await SendAsync(email, "Reset your password", body, cancellationToken);
         }
 
-        private static string BuildLink(string token)
+        private string BuildVerificationLink(string token)
         {
-            return $"https://localhost:5001/api/v1/auth/confirm-email" + $"?token={token}";
+            var baseUrl = string.IsNullOrWhiteSpace(settings.Email.BaseUrl) ? "http://localhost:5259" : settings.Email.BaseUrl.TrimEnd('/');
+            return $"{baseUrl}/api/v1/auth/verify-email?token={Uri.EscapeDataString(token)}";
+        }
+
+        private string BuildPasswordResetLink(string token)
+        {
+            var clientUrl = string.IsNullOrWhiteSpace(settings.Email.ClientUrl) ? "http://localhost:3000" : settings.Email.ClientUrl.TrimEnd('/');
+            return $"{clientUrl}/reset-password?token={Uri.EscapeDataString(token)}";
         }
 
         private async Task SendAsync(string toEmail, string subject, string htmlBody, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(settings.Email.Host))
+            {
+                logger.LogWarning("Email sending skipped: SMTP Host is not configured. Target: {ToEmail}, Subject: {Subject}", toEmail, subject);
+                return;
+            }
+
             var email = new MimeMessage();
 
             email.From.Add(new MailboxAddress(settings.Email.FromName, settings.Email.From));

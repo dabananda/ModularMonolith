@@ -1,12 +1,20 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using ModularMonolith.Api.Middleware;
+using ModularMonolith.Modules.Identity.Infrastructure.Persistence;
 using ModularMonolith.Modules.Identity.Presentation;
 using ModularMonolith.Shared;
 using ModularMonolith.Shared.Configurations;
+using ModularMonolith.Shared.Persistence;
 using Serilog;
-using Microsoft.AspNetCore.RateLimiting;
+using System.Text;
 using System.Threading.RateLimiting;
 
-Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
 try
 {
@@ -16,27 +24,96 @@ try
 
     builder.Services.AddSerilog((services, configuration) =>
         configuration.ReadFrom.Configuration(builder.Configuration)
-                     .ReadFrom.Services(services).Enrich.FromLogContext());
+                     .ReadFrom.Services(services)
+                     .Enrich.FromLogContext());
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "ModularMonolith API",
+            Version = "v1",
+            Description = "Production-ready Clean Architecture Modular Monolith Project (.NET 10)"
+        });
+
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme. Enter your JWT token directly.",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT"
+        });
+
+        options.AddSecurityRequirement(doc => new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecuritySchemeReference("Bearer", doc, null),
+                []
+            }
+        });
+    });
 
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
 
-    builder.Services.AddHealthChecks();
+    builder.Services.AddOptions<Settings>()
+        .Bind(builder.Configuration)
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
-    builder.Services.AddOptions<Settings>().Bind(builder.Configuration).ValidateDataAnnotations().ValidateOnStart();
-    var settings = builder.Configuration.Get<Settings>() ?? throw new InvalidOperationException("Settings configuration is missing or invalid.");
+    var settings = builder.Configuration.Get<Settings>()
+        ?? throw new InvalidOperationException("Settings configuration is missing or invalid.");
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Jwt.Key)),
+            ValidateIssuer = true,
+            ValidIssuer = settings.Jwt.Issuer,
+            ValidateAudience = true,
+            ValidAudience = settings.Jwt.Audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+    builder.Services.AddAuthorization();
+
+    builder.Services.AddHealthChecks()
+        .AddDbContextCheck<ApplicationDbContext>("IdentityDb")
+        .AddDbContextCheck<SharedDbContext>("SharedDb");
 
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(settings.Cors.PolicyName, policy =>
         {
-            policy.WithOrigins(settings.Cors.AllowedOrigins)
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+            if (settings.Cors.AllowedOrigins.Length > 0)
+            {
+                policy.WithOrigins(settings.Cors.AllowedOrigins)
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            }
+            else
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            }
         });
     });
 
@@ -80,15 +157,23 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "ModularMonolith API v1");
+            c.RoutePrefix = "swagger";
+        });
     }
 
     app.UseExceptionHandler();
     app.UseHttpsRedirection();
     app.UseSerilogRequestLogging();
-    app.UseRateLimiter();
-    app.UseCors(settings.Cors.PolicyName);
     app.UseStaticFiles();
+    app.UseRouting();
+    app.UseCors(settings.Cors.PolicyName);
+    app.UseRateLimiter();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.MapControllers();
     app.MapHealthChecks("/health");
 

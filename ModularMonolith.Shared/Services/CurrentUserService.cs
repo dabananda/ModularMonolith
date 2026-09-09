@@ -1,5 +1,5 @@
-﻿using ModularMonolith.Shared.Interfaces;
 using Microsoft.AspNetCore.Http;
+using ModularMonolith.Shared.Interfaces;
 using System.Security.Claims;
 
 namespace ModularMonolith.Shared.Services
@@ -12,7 +12,8 @@ namespace ModularMonolith.Shared.Services
         {
             get
             {
-                var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = httpContextAccessor.HttpContext?.User;
+                var userId = user?.FindFirstValue(ClaimTypes.NameIdentifier) ?? user?.FindFirstValue("sub");
                 return Guid.TryParse(userId, out var id) ? id : null;
             }
         }

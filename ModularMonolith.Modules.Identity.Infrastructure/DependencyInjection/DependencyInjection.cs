@@ -4,6 +4,7 @@ using ModularMonolith.Modules.Identity.Infrastructure.Repositories;
 using ModularMonolith.Modules.Identity.Infrastructure.Security;
 using ModularMonolith.Shared.Configurations;
 using ModularMonolith.Shared.Interfaces;
+using ModularMonolith.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,11 @@ namespace ModularMonolith.Modules.Identity.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services, Settings settings)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(settings.ConnectionStrings.SqlServerLocal));
+            services.AddDbContext<ApplicationDbContext>((sp, options) =>
+            {
+                options.UseSqlServer(settings.ConnectionStrings.SqlServerLocal);
+                options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
+            });
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();

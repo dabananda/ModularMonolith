@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Interfaces;
+using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Modules.Identity.Domain.Entities;
 using ModularMonolith.Modules.Identity.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +15,19 @@ namespace ModularMonolith.Modules.Identity.Infrastructure.Repositories
         public async Task RegisterAsync(ApplicationUser user, CancellationToken cancellationToken = default)
         {
             await context.Users.AddAsync(user, cancellationToken);
+        }
+
+        public async Task<ApplicationUser?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await context.Users
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+        }
+
+        public void Update(ApplicationUser user)
+        {
+            context.Users.Update(user);
         }
 
         public async Task<ApplicationUser?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)

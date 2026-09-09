@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Common;
+using ModularMonolith.Modules.Identity.Application.Common;
 using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
 using ModularMonolith.Shared.Interfaces;
@@ -18,7 +18,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.Login
             var ip = currentUserService.IpAddress;
             var user = await authRepository.GetByEmailAsync(request.Email, cancellationToken);
             if (user is null || !passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
-                return Result<LoginResponse>.Failure(ErrorType.Failure, AuthErrors.InvalidCredentials);
+                return Result<LoginResponse>.Failure(ErrorType.Unauthorized, AuthErrors.InvalidCredentials);
 
             if (!user.EmailConfirmed)
                 return Result<LoginResponse>.Failure(ErrorType.Forbidden, AuthErrors.EmailNotConfirmed);
