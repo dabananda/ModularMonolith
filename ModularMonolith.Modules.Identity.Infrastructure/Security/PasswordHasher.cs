@@ -1,0 +1,17 @@
+﻿using ModularMonolith.Modules.Identity.Application.Interfaces;
+
+namespace ModularMonolith.Modules.Identity.Infrastructure.Security
+{
+    public class PasswordHasher : IPasswordHasher
+    {
+        public string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public bool VerifyPassword(string password, string passwordHash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, passwordHash);
+        }
+    }
+}

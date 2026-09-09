@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/API/">
+    <Project Path="ModularMonolith.Api/ModularMonolith.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Identity/">
+    <Project Path="ModularMonolith.Modules.Identity.Application/ModularMonolith.Modules.Identity.Application.csproj" />
+    <Project Path="ModularMonolith.Modules.Identity.Domain/ModularMonolith.Modules.Identity.Domain.csproj" />
+    <Project Path="ModularMonolith.Modules.Identity.Infrastructure/ModularMonolith.Modules.Identity.Infrastructure.csproj" />
+    <Project Path="ModularMonolith.Modules.Identity.Presentation/ModularMonolith.Modules.Identity.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="ModularMonolith.Shared/ModularMonolith.Shared.csproj" />
+  </Folder>
+</Solution>
