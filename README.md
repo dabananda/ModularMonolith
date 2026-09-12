@@ -1,6 +1,6 @@
 # ModularMonolith
 
-A production-ready, clean architecture **Modular Monolith** starter template and backend built with **ASP.NET Core (.NET 10)**.
+A production-ready, **Modular Monolith Architecture** starter template and backend built with **ASP.NET Core (.NET 10)**.
 
 This template is designed to serve as a robust, scalable foundation for enterprise applications. Each business module is an independent vertical slice containing its own **Domain**, **Application**, **Infrastructure**, and **Presentation** layers, while sharing a common infrastructure and kernel. When the need arises, any module can be extracted into an independent microservice with minimal friction.
 
