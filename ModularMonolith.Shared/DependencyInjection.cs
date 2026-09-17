@@ -21,7 +21,7 @@ namespace ModularMonolith.Shared
 
             services.AddDbContext<SharedDbContext>((sp, options) =>
             {
-                options.UseSqlServer(settings.ConnectionStrings.SqlServerLocal);
+                options.UseNpgsql(settings.ConnectionStrings.PostgreSql);
                 options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
             });
 

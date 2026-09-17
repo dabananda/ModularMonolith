@@ -16,7 +16,7 @@ namespace ModularMonolith.Modules.Identity.Infrastructure.DependencyInjection
         {
             services.AddDbContext<ApplicationDbContext>((sp, options) =>
             {
-                options.UseSqlServer(settings.ConnectionStrings.SqlServerLocal);
+                options.UseNpgsql(settings.ConnectionStrings.PostgreSql);
                 options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
             });
 

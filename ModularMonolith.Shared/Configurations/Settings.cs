@@ -13,11 +13,8 @@ namespace ModularMonolith.Shared.Configurations
 
     public sealed class ConnectionStrings
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "SqlServerLocal connection string is required.")]
-        public string SqlServerLocal { get; set; } = string.Empty;
-
-        public string SqlServerLive { get; set; } = string.Empty;
-        public string PostgresLive { get; set; } = string.Empty;
+        [Required(AllowEmptyStrings = false, ErrorMessage = "PostgreSql database connection string is required.")]
+        public string PostgreSql { get; set; } = string.Empty;
     }
 
     public sealed class CorsSettings
