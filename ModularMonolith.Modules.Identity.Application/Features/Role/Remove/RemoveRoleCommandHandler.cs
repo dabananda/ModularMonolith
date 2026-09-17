@@ -8,8 +8,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Role.Remove
 {
     public class RemoveRoleCommandHandler(
         IAuthRepository authRepository,
-        IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<RemoveRoleCommand, Result>
+        IRoleRepository roleRepository) : IRequestHandler<RemoveRoleCommand, Result>
     {
         public async Task<Result> Handle(RemoveRoleCommand request, CancellationToken cancellationToken)
         {
@@ -28,7 +27,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Role.Remove
             user.RemoveRole(request.RoleId);
             authRepository.Update(user);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success("Role removed successfully.");
         }

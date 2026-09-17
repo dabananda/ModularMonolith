@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Interfaces;
+using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
 using ModularMonolith.Shared.Interfaces;
 using ModularMonolith.Shared.Messaging;
@@ -7,8 +7,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.Logout
 {
     public class LogoutCommandHandler(
         IAuthRepository authRepository,
-        ICurrentUserService currentUserService,
-        IUnitOfWork unitOfWork) : IRequestHandler<LogoutCommand, Result>
+        ICurrentUserService currentUserService) : IRequestHandler<LogoutCommand, Result>
     {
         public async Task<Result> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
@@ -23,7 +22,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.Logout
 
             user.RevokeRefreshToken(request.RefreshToken, ip);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

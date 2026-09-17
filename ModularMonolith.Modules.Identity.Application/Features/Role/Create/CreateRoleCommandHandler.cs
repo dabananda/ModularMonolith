@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Common;
+using ModularMonolith.Modules.Identity.Application.Common;
 using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
 using ModularMonolith.Shared.Interfaces;
@@ -8,8 +8,7 @@ using RoleEntity = ModularMonolith.Modules.Identity.Domain.Entities.Role;
 namespace ModularMonolith.Modules.Identity.Application.Features.Role.Create
 {
     public class CreateRoleCommandHandler(
-        IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<CreateRoleCommand, Result>
+        IRoleRepository roleRepository) : IRequestHandler<CreateRoleCommand, Result>
     {
         public async Task<Result> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
         {
@@ -19,7 +18,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Role.Create
             var role = RoleEntity.Create(request.Name, request.Description);
 
             await roleRepository.AddRoleAsync(role, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await roleRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

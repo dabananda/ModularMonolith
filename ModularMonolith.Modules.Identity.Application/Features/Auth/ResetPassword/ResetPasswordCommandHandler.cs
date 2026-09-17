@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Common;
+using ModularMonolith.Modules.Identity.Application.Common;
 using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
 using ModularMonolith.Shared.Interfaces;
@@ -8,8 +8,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.ResetPasswo
 {
     public class ResetPasswordCommandHandler(
         IAuthRepository authRepository,
-        IPasswordHasher passwordHasher,
-        IUnitOfWork unitOfWork) : IRequestHandler<ResetPasswordCommand, Result>
+        IPasswordHasher passwordHasher) : IRequestHandler<ResetPasswordCommand, Result>
     {
         public async Task<Result> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
@@ -29,7 +28,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.ResetPasswo
 
             user.ResetPassword(request.Token, newPasswordHash);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

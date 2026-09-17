@@ -14,6 +14,17 @@ namespace ModularMonolith.Shared.Persistence
 
             modelBuilder.HasDefaultSchema("shared");
 
+            modelBuilder.Entity<Image>(builder =>
+            {
+                builder.ToTable("Images");
+                builder.HasKey(x => x.Id);
+                builder.Property(x => x.PublicId).HasMaxLength(256).IsRequired();
+                builder.Property(x => x.Url).HasMaxLength(2048).IsRequired();
+                builder.Property(x => x.SecureUrl).HasMaxLength(2048).IsRequired();
+                builder.HasIndex(x => x.EntityId);
+                builder.HasIndex(x => x.PublicId);
+            });
+
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 if (!typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))

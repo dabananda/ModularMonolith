@@ -10,8 +10,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.Login
         IAuthRepository authRepository,
         IPasswordHasher passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator,
-        ICurrentUserService currentUserService,
-        IUnitOfWork unitOfWork) : IRequestHandler<LoginCommand, Result<LoginResponse>>
+        ICurrentUserService currentUserService) : IRequestHandler<LoginCommand, Result<LoginResponse>>
     {
         public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
@@ -35,7 +34,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.Login
             user.RecordLogin();
 
             await authRepository.AddRefreshTokenAsync(refreshToken, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             var response = new LoginResponse(refreshToken.User.Id, refreshToken.User.Email, accessToken, accessTokenExpiresAt, refreshToken.Token, refreshTokenExpiresAt);
             return Result<LoginResponse>.Success(response);

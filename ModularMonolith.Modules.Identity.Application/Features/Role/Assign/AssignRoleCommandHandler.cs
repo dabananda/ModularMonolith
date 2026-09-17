@@ -8,8 +8,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Role.Assign
 {
     public class AssignRoleCommandHandler(
         IAuthRepository authRepository,
-        IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<AssignRoleCommand, Result>
+        IRoleRepository roleRepository) : IRequestHandler<AssignRoleCommand, Result>
     {
         public async Task<Result> Handle(AssignRoleCommand request, CancellationToken cancellationToken)
         {
@@ -28,7 +27,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Role.Assign
             user.AssignRole(role);
             authRepository.Update(user);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success("Role assigned successfully.");
         }

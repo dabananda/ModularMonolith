@@ -52,7 +52,7 @@ namespace ModularMonolith.Shared.Services
                 result.Url?.ToString() ?? string.Empty,
                 result.SecureUrl?.ToString() ?? string.Empty);
 
-            await _context.Images.AddAsync(image, cancellationToken);
+            _context.Images.Add(image);
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result<ImageUploadResult>.Success(new ImageUploadResult(
@@ -79,7 +79,6 @@ namespace ModularMonolith.Shared.Services
             }
 
             image.MarkDeleted();
-            _context.Images.Update(image);
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result.Success("Image deleted successfully.");
@@ -95,8 +94,6 @@ namespace ModularMonolith.Shared.Services
             }
 
             image.SetEntityId(entityId);
-
-            _context.Images.Update(image);
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

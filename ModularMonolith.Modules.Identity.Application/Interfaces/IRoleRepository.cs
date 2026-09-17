@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Domain.Entities;
+using ModularMonolith.Modules.Identity.Domain.Entities;
 
 namespace ModularMonolith.Modules.Identity.Application.Interfaces
 {
@@ -11,5 +11,6 @@ namespace ModularMonolith.Modules.Identity.Application.Interfaces
         Task<Role?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<Role>> GetAllAsync(CancellationToken cancellationToken = default);
         void UpdateRole(Role role);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

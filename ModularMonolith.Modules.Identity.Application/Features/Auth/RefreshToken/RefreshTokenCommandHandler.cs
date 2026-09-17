@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Common;
+using ModularMonolith.Modules.Identity.Application.Common;
 using ModularMonolith.Modules.Identity.Application.Features.Auth.Login;
 using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
@@ -10,8 +10,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.RefreshToke
     public class RefreshTokenCommandHandler(
         IAuthRepository authRepository,
         IJwtTokenGenerator jwtTokenGenerator,
-        ICurrentUserService currentUserService,
-        IUnitOfWork unitOfWork) : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
+        ICurrentUserService currentUserService) : IRequestHandler<RefreshTokenCommand, Result<LoginResponse>>
     {
         public async Task<Result<LoginResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
@@ -40,7 +39,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.RefreshToke
             user.RevokeRefreshToken(request.RefreshToken, ip, newRefreshTokenValue);
 
             await authRepository.AddRefreshTokenAsync(newRefreshToken, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             var response = new LoginResponse(
                 newRefreshToken.User.Id,

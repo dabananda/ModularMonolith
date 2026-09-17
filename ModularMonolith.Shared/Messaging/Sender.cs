@@ -43,12 +43,19 @@ namespace ModularMonolith.Shared.Messaging
                 var handler = provider.GetService<IRequestHandler<TRequest, TResponse>>()
                     ?? throw new InvalidOperationException($"No handler registered for {typeof(TRequest).Name}.");
 
-                var behaviors = provider.GetServices<IPipelineBehavior<TRequest, TResponse>>().Reverse();
+                var behaviors = provider.GetServices<IPipelineBehavior<TRequest, TResponse>>();
+                var behaviorList = behaviors as IList<IPipelineBehavior<TRequest, TResponse>> ?? behaviors.ToList();
+
+                if (behaviorList.Count == 0)
+                {
+                    return await handler.Handle((TRequest)request, cancellationToken);
+                }
 
                 RequestHandlerDelegate<TResponse> current = () => handler.Handle((TRequest)request, cancellationToken);
 
-                foreach (var behavior in behaviors)
+                for (var i = behaviorList.Count - 1; i >= 0; i--)
                 {
+                    var behavior = behaviorList[i];
                     var next = current;
                     current = () => behavior.Handle((TRequest)request, cancellationToken, next);
                 }

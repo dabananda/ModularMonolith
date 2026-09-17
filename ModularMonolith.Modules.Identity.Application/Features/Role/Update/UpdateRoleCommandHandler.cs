@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Common;
+using ModularMonolith.Modules.Identity.Application.Common;
 using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
 using ModularMonolith.Shared.Interfaces;
@@ -7,8 +7,7 @@ using ModularMonolith.Shared.Messaging;
 namespace ModularMonolith.Modules.Identity.Application.Features.Role.Update
 {
     public class UpdateRoleCommandHandler(
-        IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<UpdateRoleCommand, Result>
+        IRoleRepository roleRepository) : IRequestHandler<UpdateRoleCommand, Result>
     {
         public async Task<Result> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
         {
@@ -22,7 +21,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Role.Update
 
             role.UpdateDetails(request.Name, request.Description);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await roleRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

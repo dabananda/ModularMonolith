@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Common;
+using ModularMonolith.Modules.Identity.Application.Common;
 using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Modules.Identity.Domain.Constants;
 using ModularMonolith.Modules.Identity.Domain.Entities;
@@ -13,8 +13,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.Register
         IRoleRepository roleRepository,
         IPasswordHasher passwordHasher,
         ISecureTokenGenerator secureTokenGenerator,
-        IEmailService emailService,
-        IUnitOfWork unitOfWork) : IRequestHandler<RegisterCommand, Result>
+        IEmailService emailService) : IRequestHandler<RegisterCommand, Result>
     {
         public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
@@ -37,7 +36,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.Register
             await authRepository.RegisterAsync(user, cancellationToken);
             await authRepository.AddEmailVerificationTokenAsync(emailVerificationToken, cancellationToken);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             await emailService.SendEmailVerificationLinkAsync(user.Username, user.Email, verificationToken, cancellationToken);
 

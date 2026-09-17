@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Domain.Entities;
+using ModularMonolith.Modules.Identity.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,6 +22,8 @@ namespace ModularMonolith.Modules.Identity.Infrastructure.Persistence.Configurat
 
             builder.HasIndex(x => x.Token)
                    .IsUnique();
+
+            builder.HasIndex(x => x.UserId);
         }
     }
 }

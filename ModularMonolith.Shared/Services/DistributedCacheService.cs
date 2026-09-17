@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Distributed;
 using ModularMonolith.Shared.Interfaces;
 using System.Text.Json;
 
@@ -8,26 +8,26 @@ namespace ModularMonolith.Shared.Services
     {
         public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
         {
-            var cachedValue = await _cache.GetStringAsync(key, cancellationToken);
+            var cachedBytes = await _cache.GetAsync(key, cancellationToken);
 
-            if (cachedValue is null)
+            if (cachedBytes is null || cachedBytes.Length == 0)
             {
                 return default;
             }
 
-            return JsonSerializer.Deserialize<T>(cachedValue, JsonOptions);
+            return JsonSerializer.Deserialize<T>(cachedBytes, JsonOptions);
         }
 
         public async Task SetAsync<T>(string key, T value, TimeSpan expiration, CancellationToken cancellationToken = default)
         {
-            var serializedValue = JsonSerializer.Serialize(value, JsonOptions);
+            var serializedBytes = JsonSerializer.SerializeToUtf8Bytes(value, JsonOptions);
 
             var options = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = expiration
             };
 
-            await _cache.SetStringAsync(key, serializedValue, options, cancellationToken);
+            await _cache.SetAsync(key, serializedBytes, options, cancellationToken);
         }
 
         public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)

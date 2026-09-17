@@ -28,6 +28,10 @@ try
                      .Enrich.FromLogContext());
 
     builder.Services.AddControllers();
+    builder.Services.AddResponseCompression(options =>
+    {
+        options.EnableForHttps = true;
+    });
     builder.Services.AddEndpointsApiExplorer();
 
     builder.Services.AddSwaggerGen(options =>
@@ -166,8 +170,8 @@ try
 
     app.UseExceptionHandler();
     app.UseHttpsRedirection();
+    app.UseResponseCompression();
     app.UseSerilogRequestLogging();
-    app.UseStaticFiles();
     app.UseRouting();
     app.UseCors(settings.Cors.PolicyName);
     app.UseRateLimiter();

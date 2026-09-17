@@ -3,7 +3,6 @@ using ModularMonolith.Modules.Identity.Infrastructure.Persistence;
 using ModularMonolith.Modules.Identity.Infrastructure.Repositories;
 using ModularMonolith.Modules.Identity.Infrastructure.Security;
 using ModularMonolith.Shared.Configurations;
-using ModularMonolith.Shared.Interfaces;
 using ModularMonolith.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,6 @@ namespace ModularMonolith.Modules.Identity.Infrastructure.DependencyInjection
                 options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
             });
 
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<ISecureTokenGenerator, SecureTokenGenerator>();
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();

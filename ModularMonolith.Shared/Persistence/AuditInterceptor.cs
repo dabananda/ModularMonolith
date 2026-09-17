@@ -24,7 +24,7 @@ namespace ModularMonolith.Shared.Persistence
 
         private void ApplyAuditInformation(DbContext? context)
         {
-            if (context is null)
+            if (context is null || !context.ChangeTracker.HasChanges())
                 return;
 
             var now = DateTime.UtcNow;

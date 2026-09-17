@@ -13,6 +13,10 @@ namespace ModularMonolith.Shared.Common
             pageSize = pageSize < 1 ? DefaultPageSize : Math.Min(pageSize, MaxPageSize);
 
             var totalCount = await query.CountAsync(cancellationToken);
+            if (totalCount == 0 || (pageNumber - 1) * pageSize >= totalCount)
+            {
+                return PagedResult<T>.Create([], pageNumber, pageSize, totalCount);
+            }
 
             var items = await query
                 .Skip((pageNumber - 1) * pageSize)

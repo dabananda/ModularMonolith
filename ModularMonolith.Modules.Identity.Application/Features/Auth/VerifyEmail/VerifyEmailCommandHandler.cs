@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Common;
+using ModularMonolith.Modules.Identity.Application.Common;
 using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
 using ModularMonolith.Shared.Interfaces;
@@ -7,8 +7,7 @@ using ModularMonolith.Shared.Messaging;
 namespace ModularMonolith.Modules.Identity.Application.Features.Auth.VerifyEmail
 {
     public class VerifyEmailCommandHandler(
-        IAuthRepository authRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<VerifyEmailCommand, Result>
+        IAuthRepository authRepository) : IRequestHandler<VerifyEmailCommand, Result>
     {
         public async Task<Result> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
         {
@@ -26,7 +25,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.VerifyEmail
 
             user.ConfirmEmailWithToken(request.Token);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

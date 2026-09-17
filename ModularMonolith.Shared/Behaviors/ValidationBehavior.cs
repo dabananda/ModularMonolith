@@ -12,28 +12,30 @@ namespace ModularMonolith.Shared.Behaviors
     {
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            var validatorList = validators.ToList();
-            if (validatorList.Count == 0)
+            if (!validators.Any())
             {
                 return await next();
             }
 
-            var failures = new List<string>();
+            List<string>? failures = null;
 
-            foreach (var validator in validatorList)
+            foreach (var validator in validators)
             {
                 var result = await validator.ValidateAsync(request, cancellationToken);
 
                 if (!result.IsValid)
                 {
-                    failures.AddRange(result.Errors.Select(x =>
-                        string.IsNullOrWhiteSpace(x.PropertyName)
-                            ? x.ErrorMessage
-                            : $"{x.PropertyName}: {x.ErrorMessage}"));
+                    failures ??= [];
+                    foreach (var error in result.Errors)
+                    {
+                        failures.Add(string.IsNullOrWhiteSpace(error.PropertyName)
+                            ? error.ErrorMessage
+                            : $"{error.PropertyName}: {error.ErrorMessage}");
+                    }
                 }
             }
 
-            if (failures.Count == 0)
+            if (failures is null || failures.Count == 0)
             {
                 return await next();
             }

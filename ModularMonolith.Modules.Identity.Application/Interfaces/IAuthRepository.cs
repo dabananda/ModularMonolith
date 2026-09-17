@@ -15,5 +15,6 @@ namespace ModularMonolith.Modules.Identity.Application.Interfaces
         Task AddPasswordResetTokenAsync(PasswordResetToken token, CancellationToken cancellationToken = default);
         Task<ApplicationUser?> GetByPasswordResetTokenAsync(string token, CancellationToken cancellationToken = default);
         void Update(ApplicationUser user);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

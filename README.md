@@ -110,8 +110,7 @@ ModularMonolith/
 │   │   ├── ICacheService.cs
 │   │   ├── ICurrentUserService.cs
 │   │   ├── IEmailService.cs
-│   │   ├── IImageService.cs
-│   │   └── IUnitOfWork.cs
+│   │   └── IImageService.cs
 │   ├── Messaging/                                      # Zero-dependency CQRS mediator
 │   │   ├── IRequest.cs
 │   │   ├── IRequestHandler.cs

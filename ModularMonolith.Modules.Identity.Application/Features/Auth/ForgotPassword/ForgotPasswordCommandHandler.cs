@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Interfaces;
+using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Shared.Common;
 using ModularMonolith.Shared.Interfaces;
 using ModularMonolith.Shared.Messaging;
@@ -9,8 +9,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.ForgotPassw
         IAuthRepository authRepository,
         IEmailService emailService,
         ICurrentUserService currentUserService,
-        ISecureTokenGenerator secureTokenGenerator,
-        IUnitOfWork unitOfWork) : IRequestHandler<ForgotPasswordCommand, Result>
+        ISecureTokenGenerator secureTokenGenerator) : IRequestHandler<ForgotPasswordCommand, Result>
     {
         public async Task<Result> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {
@@ -25,7 +24,7 @@ namespace ModularMonolith.Modules.Identity.Application.Features.Auth.ForgotPassw
             var passwordResetToken = user.IssuePasswordResetToken(resetToken, resetTokenExpiresAt, ip);
 
             await authRepository.AddPasswordResetTokenAsync(passwordResetToken, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await authRepository.SaveChangesAsync(cancellationToken);
 
             await emailService.SendPasswordResetLinkAsync(user.Username, user.Email, resetToken, cancellationToken);
 

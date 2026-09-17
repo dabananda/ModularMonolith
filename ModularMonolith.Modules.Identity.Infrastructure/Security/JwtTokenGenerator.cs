@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Modules.Identity.Application.Interfaces;
+using ModularMonolith.Modules.Identity.Application.Interfaces;
 using ModularMonolith.Modules.Identity.Domain.Entities;
 using ModularMonolith.Shared.Configurations;
 using Microsoft.IdentityModel.Tokens;
@@ -9,11 +9,22 @@ using System.Text;
 
 namespace ModularMonolith.Modules.Identity.Infrastructure.Security
 {
-    public class JwtTokenGenerator(Settings settings) : IJwtTokenGenerator
+    public class JwtTokenGenerator : IJwtTokenGenerator
     {
+        private readonly Settings _settings;
+        private readonly SigningCredentials _signingCredentials;
+        private readonly JwtSecurityTokenHandler _tokenHandler = new();
+
+        public JwtTokenGenerator(Settings settings)
+        {
+            _settings = settings;
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Jwt.Key));
+            _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        }
+
         public (string Token, DateTime ExpiresAt) GenerateAccessToken(ApplicationUser user, IEnumerable<string> roles)
         {
-            var expiresAt = DateTime.UtcNow.AddMinutes(settings.Jwt.AccessTokenExpiryMinutes);
+            var expiresAt = DateTime.UtcNow.AddMinutes(_settings.Jwt.AccessTokenExpiryMinutes);
 
             var claims = new List<Claim>
             {
@@ -25,27 +36,25 @@ namespace ModularMonolith.Modules.Identity.Infrastructure.Security
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Jwt.Key));
-            var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var token = new JwtSecurityToken(
-                issuer: settings.Jwt.Issuer,
-                audience: settings.Jwt.Audience,
+                issuer: _settings.Jwt.Issuer,
+                audience: _settings.Jwt.Audience,
                 claims: claims,
                 notBefore: DateTime.UtcNow,
                 expires: expiresAt,
-                signingCredentials: signingCredentials);
+                signingCredentials: _signingCredentials);
 
-            var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenValue = _tokenHandler.WriteToken(token);
 
             return (tokenValue, expiresAt);
         }
 
         public (string Token, DateTime ExpiresAt) GenerateRefreshToken()
         {
-            var randomBytes = RandomNumberGenerator.GetBytes(64);
+            Span<byte> randomBytes = stackalloc byte[64];
+            RandomNumberGenerator.Fill(randomBytes);
             var token = Convert.ToBase64String(randomBytes);
-            var expiresAt = DateTime.UtcNow.AddDays(settings.Jwt.RefreshTokenExpiryDays);
+            var expiresAt = DateTime.UtcNow.AddDays(_settings.Jwt.RefreshTokenExpiryDays);
 
             return (token, expiresAt);
         }

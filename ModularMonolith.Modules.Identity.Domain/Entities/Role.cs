@@ -1,4 +1,4 @@
-﻿using ModularMonolith.Shared.Entities;
+using ModularMonolith.Shared.Entities;
 
 namespace ModularMonolith.Modules.Identity.Domain.Entities
 {
@@ -19,12 +19,6 @@ namespace ModularMonolith.Modules.Identity.Domain.Entities
             return new Role { Name = name, Description = description };
         }
 
-        public void Rename(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Role name is required.", nameof(name));
-            Name = name;
-        }
 
         public void UpdateDetails(string name, string? description)
         {

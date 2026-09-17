@@ -22,7 +22,6 @@ namespace ModularMonolith.Tests
         private readonly Mock<ISecureTokenGenerator> _tokenGenMock = new();
         private readonly Mock<IEmailService> _emailServiceMock = new();
         private readonly Mock<ICurrentUserService> _currentUserMock = new();
-        private readonly Mock<IUnitOfWork> _uowMock = new();
 
         public AuthFeaturesTests()
         {
@@ -40,8 +39,7 @@ namespace ModularMonolith.Tests
                 _authRepoMock.Object,
                 _hasherMock.Object,
                 _jwtMock.Object,
-                _currentUserMock.Object,
-                _uowMock.Object);
+                _currentUserMock.Object);
 
             var result = await handler.Handle(new LoginCommand("user@test.com", "wrongpwd"), CancellationToken.None);
 
@@ -62,8 +60,7 @@ namespace ModularMonolith.Tests
                 _authRepoMock.Object,
                 _hasherMock.Object,
                 _jwtMock.Object,
-                _currentUserMock.Object,
-                _uowMock.Object);
+                _currentUserMock.Object);
 
             var result = await handler.Handle(new LoginCommand("user@test.com", "password"), CancellationToken.None);
 
@@ -90,8 +87,7 @@ namespace ModularMonolith.Tests
                 _authRepoMock.Object,
                 _hasherMock.Object,
                 _jwtMock.Object,
-                _currentUserMock.Object,
-                _uowMock.Object);
+                _currentUserMock.Object);
 
             var result = await handler.Handle(new LoginCommand("user@test.com", "password"), CancellationToken.None);
 
@@ -99,7 +95,7 @@ namespace ModularMonolith.Tests
             result.Data.Should().NotBeNull();
             result.Data!.AccessToken.Should().Be("access_token_123");
             result.Data!.RefreshToken.Should().Be("refresh_token_123");
-            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _authRepoMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -113,8 +109,7 @@ namespace ModularMonolith.Tests
                 _roleRepoMock.Object,
                 _hasherMock.Object,
                 _tokenGenMock.Object,
-                _emailServiceMock.Object,
-                _uowMock.Object);
+                _emailServiceMock.Object);
 
             var result = await handler.Handle(new RegisterCommand("existing@test.com", "Pass123!"), CancellationToken.None);
 
@@ -136,15 +131,14 @@ namespace ModularMonolith.Tests
 
             var handler = new AssignRoleCommandHandler(
                 _authRepoMock.Object,
-                _roleRepoMock.Object,
-                _uowMock.Object);
+                _roleRepoMock.Object);
 
             var result = await handler.Handle(new AssignRoleCommand(user.Id, role.Id), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             user.UserRoles.Should().Contain(ur => ur.RoleId == role.Id);
             _authRepoMock.Verify(x => x.Update(user), Times.Once);
-            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _authRepoMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -161,15 +155,14 @@ namespace ModularMonolith.Tests
 
             var handler = new RemoveRoleCommandHandler(
                 _authRepoMock.Object,
-                _roleRepoMock.Object,
-                _uowMock.Object);
+                _roleRepoMock.Object);
 
             var result = await handler.Handle(new RemoveRoleCommand(user.Id, role.Id), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             user.UserRoles.Should().NotContain(ur => ur.RoleId == role.Id);
             _authRepoMock.Verify(x => x.Update(user), Times.Once);
-            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            _authRepoMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }
